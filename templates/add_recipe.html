@@ -1,0 +1,93 @@
+{% extends "base_template.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Add recipe
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+    .form_ingredients {
+        height: 600px;
+    }
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <!--Form for å legge til oppskrifter-->
+            <form method="post" enctype="multipart/form-data" class="col-lg-9">
+                {% csrf_token %}
+                {% with WIDGET_ERROR_CLASS="is-invalid" %}
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                {% render_field form.chef %}
+                                <h4>Lag oppskrift</h4>
+                                {% render_field form.name class="form-control mb-2"%}
+                                <small class="text-danger">{{ form.name.errors }}</small>
+                                {% render_field form.recipe_text class="form-control mb-2" %}
+                                <small class="text-danger">{{ form.recipe_text.errors }}</small>
+
+                                {% render_field form.pub_date class="form-control mb-2"%}
+                                <small class="text-danger">{{ form.pub_date.errors }}</small>
+
+                                <h4>Legg til bilde</h4>
+
+                                {% render_field form.image %}
+                                <small class="text-danger">{{ form.image.errors }}</small>
+
+                                <button type="submit" class="btn btn-success float-right" name="recipe_form">Lag oppskrift!</button>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                                <h4>Velg ingredienser:</h4>
+                                {% render_field form.ingredients class="form-control form_ingredients" size="15"%}
+                        </div>
+                    </div>
+                {% endwith %}
+            </form>
+            <!--Form for å legge til ingredienser-->
+            <form method="post" id="add_ingredient_form" class="col-lg-3">
+                {% csrf_token %}
+                    {{ ingredient_form.errors }}
+                    <h4>Legg til ingrediens</h4>
+                    {% render_field ingredient_form.ingredient class="form-control mb-2" %}
+                    {% render_field ingredient_form.ingredient_type class="form-control mb-2" %}
+                    <br>
+                    <button type="submit" class="btn btn-success float-right" name="ingredient_form">Legg til</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+    //Mousedown event for å kunne velge flere ingredienser uten ctrl
+    $('#id_ingredients option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+    //lagrer informasjon om oppskrift i session storage før siden lastes ut
+    window.onbeforeunload = function() {
+        sessionStorage.setItem("name", $('#id_name').val());
+        sessionStorage.setItem("recipe_text", $('#id_recipe_text').val());
+
+        let arr = $("#id_ingredients").val();
+        sessionStorage.setItem("chosen_ingredients", JSON.stringify(arr));
+    };
+
+    //henter informasjon om oppskrift fra session storage når siden lastes inn
+    window.onload = function() {
+        let name = sessionStorage.getItem("name");
+        let recipe_text = sessionStorage.getItem("recipe_text");
+        $("#id_name").val(name);
+        $("#id_recipe_text").val(recipe_text);
+
+        let chosen_ingredients = JSON.parse(sessionStorage.getItem("chosen_ingredients"));
+        let arr = [];
+        chosen_ingredients.forEach( function (i) {
+           arr.push(parseInt(i));
+        });
+        $("select").val(arr);
+    };
+    </script>
+{% endblock %}

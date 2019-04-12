@@ -1,0 +1,29 @@
+<div class="list-group">
+    <a href="{% url 'recipe' recipe.recipe.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="media">
+            <img class="img-thumbnail" src="{{ recipe.recipe.image.url }}" style="width: 100px; height: 100px">
+                <div style="padding-left: 10px">
+                    <h5 class="mb-1">{{ recipe.recipe.name }}</h5>
+                    <small> {{ recipe.pub_date }} </small>
+                    <!-- Skriver ut hver ingrediens i oppskriften -->
+                    <!-- Tydeliggjør hvilke ingredienser brukeren mangler -->
+                    <small>
+                        {% if not recipe.missing %}
+                                <span style="color: #5cb85c">Du mangler ingen ingredienser</span>
+                        {% else %}
+                            <div style="color:#d9534f">
+
+                            <span>Du mangler: </span>
+                            {% for ingredient in recipe.missing %}
+                                    <span>{{ ingredient }}{% include "comma.html" %}</span>
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+                    </small>
+                    <div>
+                        <small>Kokk: {{ recipe.recipe.chef }}</small>
+                    </div>
+                </div>
+        </div>
+    </a>
+</div>

@@ -1,0 +1,257 @@
+{% extends "../base_template.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Registrering
+{% endblock %}
+
+{% block css %}
+    .form_image {
+        height: 45px;
+    }
+{% endblock %}
+
+{% block registration %}
+    <div style="width:500px;margin:0 auto 0 auto">
+        <div class="x-4 pb-4 pt-2 mt-5">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="user-tab" data-toggle="tab" href="#user" role="tab" aria-controls="user" aria-selected="true">Bruker</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="chef-tab" data-toggle="tab" href="#chef" role="tab" aria-controls="chef" aria-selected="false">Kokk</a>
+
+            </ul>
+            <div class="tab-content shadow-lg p-2 border-left border-right border-bottom" id="myTabContent">
+                <!--Legg til form for registrering av vanlig bruker i denne div tagen-->
+                <div class="tab-pane fade show active overflow-auto" id="user" role="tabpanel" aria-labelledby="user-tab">
+                    <h4> Register deg som bruker </h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% with WIDGET_ERROR_CLASS="is-invalid" %}
+                             <!-- Vis error meldinger i alert boks øverst-->
+                            {% if user_form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {% for error in user_form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <!-- Brukernavn -->
+                            <div class="input-group mt-2 mb-1">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-user fa-fw"></span> </div>
+                                </div>
+                                    {% render_field user_form.username class="form-control" placeholder='Brukernavn'%}
+                            </div>
+                            <small class="text-danger">{{ user_form.username.errors }}</small>
+
+                            <!-- Passord -->
+                            <div class="input-group mt-2 mb-1">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-lock fa-fw"></span> </div>
+                                </div>
+                                    {% render_field user_form.password1 class="form-control" placeholder='Passord (inkluder minst ett tall)'%}
+
+                            </div>
+                            <small class="text-danger">{{ user_form.password1.errors }}</small>
+
+                            <!-- Password-confirmation -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-lock fa-fw"></span> </div>
+                                </div>
+                                    {% render_field user_form.password2 class="form-control" placeholder='Repeter passord'%}
+                            </div>
+                            <small class="text-danger">{{ user_form.password2.errors }}</small>
+                        {% endwith %}
+                        <button type="submit" name="brukerreg" class="btn btn-primary mr-0 float-right">Registrer</button>
+                    </form>
+                 </div>
+
+                <!--Legg til form for registrering av kokk i denne div tagen, se kommentar i login.html for AJAX validering! -->
+                <div class="tab-pane fade overflow-auto" id="chef" role="tabpanel" aria-labelledby="chef-tab">
+                    <h4>Registrer deg som kokk</h4>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% with WIDGET_ERROR_CLASS="is-invalid" %}
+                            <!-- Brukernavn -->
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-user fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.username class="form-control" placeholder='Brukernavn'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.username.errors }}</small>
+
+                            <!-- Passord -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-lock fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.password1 class="form-control" placeholder='Passord (inkluder minst ett tall)'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.password1.errors }}</small>
+
+                            <!-- Password-confirmation -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-lock fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.password2 class="form-control" placeholder='Repeter passord'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.password2.errors }}</small>
+
+                            <hr>
+
+                            <!-- Fornavn -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-tag fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.first_name class="form-control" placeholder='Fornavn'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.first_name.errors }}</small>
+
+                            <!-- Etternavn -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-tags fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.last_name class="form-control" placeholder='Etternavn'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.last_name.errors }}</small>
+
+                            <!-- Merit -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-star fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.merit class="form-control" placeholder='Merit'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.merit.errors }}</small>
+
+                            <!-- Utdanning -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-graduation-cap fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.education class="form-control" placeholder='Utdanning'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.education.errors }}</small>
+
+                            <!-- Arbeidssted -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-briefcase fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.workplace class="form-control" placeholder='Arbeidssted'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.workplace.errors }}</small>
+
+                                <!-- Informasjon -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-info-circle fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.info class="form-control" placeholder='Ytterligere informasjon'%}
+                            </div>
+                            <small class="text-danger">{{ chef_form.info.errors }}</small>
+
+                            <!-- Bilde -->
+                            <div class="input-group mt-2 mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-camera-retro fa-fw"></span> </div>
+                                    {% render_field chef_form.image class='form-control form_image'%}
+                                </div>
+
+                            </div>
+                            <small class="text-danger">{{ chef_form.image.errors }}</small>
+
+                        {% endwith %}
+                        <button type="submit" name="kokkereg" class="btn btn-primary mr-0 float-right">Registrer</button>
+                    </form>
+                 </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+
+    <!--Viser chef eller user i url for å kunne linke til hver sin side-->
+    <script>
+    $(function(){
+        var hash = window.location.hash;
+        hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+        $('.nav-tabs a').click(function (e) {
+            $(this).tab('show');
+            var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+            window.location.hash = this.hash;
+        $('html,body').scrollTop(scrollmem);
+        });
+    });
+
+    </script>
+
+
+    <!--Validerer brukernavn-->
+    <script>
+        $("#chef_username").change(function () {
+
+            let username =  $(this).val();
+
+            $.ajax({
+                url: '/ajax/validate_username/',
+                data: {
+                    'username': username
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if(data.is_taken) {
+                        $("#chef_username").removeClass("is-valid").addClass("is-invalid");
+                    }
+                    else {
+                        $("#chef_username").removeClass("is-invalid").addClass("is-valid");
+                    }
+                }
+            });
+
+        });
+        $("#id_username").change(function () {
+
+            let username =  $(this).val();
+
+            $.ajax({
+                url: '/ajax/validate_username/',
+                data: {
+                    'username': username
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if(data.is_taken) {
+                        $("#id_username").removeClass("is-valid").addClass("is-invalid");
+                    }
+                    else {
+                        $("#id_username").removeClass("is-invalid").addClass("is-valid");
+                    }
+                }
+            });
+
+        });
+    </script>
+
+    <!--Passord styrke -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pwstrength-bootstrap/3.0.2/pwstrength-bootstrap.min.js"></script>
+    <script>
+    $('#id_password1').pwstrength({
+        ui: { showVerdictsInsideProgressBar: true }
+    });
+    </script>
+{% endblock %}
+
+

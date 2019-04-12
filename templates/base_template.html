@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}  {% endblock title%} | Matega</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        {% load static %}
+        <link rel="shortcut icon" href="{% static "media/logo/favicon.png" %}">
+        <style>
+            #content {
+                max-width: 1000px;
+                margin-top: 78px;
+                margin-left: 300px;
+            }
+            #sidebar {
+                position: fixed;
+                width: 250px;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 1;
+                background: #C4D290;
+                color: #fff;
+                transition: all 0.3s;
+                overflow: auto;
+            }
+
+            #sidebar .sidebar-header {
+
+                padding: 20px;
+                background: #9BB07C;
+            }
+
+            #sidebar ul p {
+                color: #fff;
+                padding: 10px;
+            }
+
+            #sidebar ul li a {
+                padding: 10px;
+                font-size: 1.1em;
+                display: block;
+            }
+
+            #sidebar {
+                min-width: 250px;
+                max-width: 250px;
+                min-height: 100vh;
+
+            }
+
+            #sidebar.active {
+                margin-left: -250px;
+            }
+            #sidebar-header {
+                height: 56px;
+                background: #658361;
+            }
+            #sidebarCollapse {
+                z-index: 2;
+                position: absolute;
+                left:10px;
+                color: white;
+            }
+            #ingredients_list {
+                padding: 10px 10px 0 20px;
+            }
+            {% block css %}
+            {% endblock %}
+        </style>
+    </head>
+    <body>
+        {% include 'navbar.html' %}
+
+        <nav id="sidebar" class="active">
+            <div id="sidebar-header">
+
+            </div>
+           <div class="sidebar-header">
+                <h4>Dine ingredienser</h4>
+            </div>
+            <ul class="list-unstyled components" id="ingredients_list">
+            </ul>
+        </nav>
+
+        <div id="content">
+             <!--Melding for de som venter på å bli kokk -->
+            {% if user.asked_for_perm %}
+                <div class="alert alert-info" role="alert">
+                    Du venter på kokkegodkjennelse fra admin. Kokkefunksjoner vil derfor være utilgjengelig.
+                </div>
+            {% endif %}
+
+            <!--Vise alle meldinger under navbaren. Meldinger kan legges til i view med messages.add_message(request, messages.INFO/WARNING/DANGER etc, "melding") -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+
+            {% endblock content %}
+        </div>
+        <div>
+            {% block registration %}
+            {% endblock %}
+        </div>
+    <!--jQuery og Bootstrap Javascript cdn-->
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js" integrity="sha384-zDnhMsjVZfS3hiP7oCBRmfjkQC4fzxVxFhBx8Hkz2aZX8gEvA/jsP3eXRCvzTofP" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+            update_owned_ingredients();
+
+        });
+        //henter ingredienser fra lokalstorage og viser de i sidebaren
+        function update_owned_ingredients() {
+            let x = $('#ingredients_list');
+            x.html("");
+
+            let arr = JSON.parse(localStorage.getItem('checked')) || [];
+            arr.forEach(function (i) {
+                $('<li/>')
+                    .appendTo('#ingredients_list')
+                    .html(i);
+                $("[class='"+ i + "']").css('color', 'green');
+            });
+            if(x.html() === "") {
+                x.html("<a href='{% url 'ingredient_search' %}'>Legg til ingredienser</a> for å finne oppskrifter du kan lage")
+            }
+        }
+    </script>
+    {% block script %}
+
+    {% endblock %}
+    </body>
+</html>

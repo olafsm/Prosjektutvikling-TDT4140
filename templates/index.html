@@ -1,0 +1,61 @@
+{% extends "base_template.html" %}
+{% block title %}
+    Oppskrifter
+{% endblock %}
+
+{% block content %}
+    {% if latest_recipe_list %}
+       <div class="row">
+           <div id="recipes_list" class="list-group col-12">
+               <h3>Oppskrifter</h3>
+               <!-- Linkene til oppskriftene blir lagt inn her i rett rekkefølge -->
+           </div>
+       </div>
+    {% else %}
+        <p>Ingen oppskrifter er tilgjengelige.</p>
+    {% endif %}
+    <!-- Lager en link til hver oppskrift -->
+    {%for recipe in latest_recipe_list %}
+        <a id="recipe_{{ recipe.id }}" style="display: none; max-width: 600px;" href="{% url 'recipe' recipe.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="media">
+                <img class="img-thumbnail" src="{{ recipe.image.url }}" style="width: 100px; height: 100px">
+                <div style="padding-left: 10px">
+                    <h5 class="mb-1" style="text-align: left">{{ recipe.name }}</h5>
+                    <small> {{ recipe.pub_date }} </small>
+                    <p class="mb-1">
+                        <!-- Skriver ut hver ingrediens i oppskriften -->
+                        {% for ingredient in recipe.ingredients.all %}
+                            <span style="color:red" class="{{ ingredient.ingredient}}">{{ ingredient.ingredient }}{% include "comma.html" %}</span>
+                        {% endfor %}
+                    </p>
+                    <small>Kokk: {{ recipe.chef }}</small>
+                </div>
+            </div>
+        </a>
+    {%endfor%}
+{% endblock %}
+{% block script %}
+    <script>
+        $( document ).ready(function() {
+            let arr = JSON.parse(localStorage.getItem('checked')) || [];
+
+            var recipes_list = document.getElementById("recipes_list");
+            $.ajax({
+                url: '/ajax/sort_by_ingredients/',
+                data: {
+                    'ingredients': JSON.stringify(arr),
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var recipes = data.latest_recipe_list;
+                    for (let i=0; i<recipes.length; i++) {
+                        console.log(recipes[i]);
+                        var el = document.getElementById("recipe_"+recipes[i]);
+                        recipes_list.appendChild(el);
+                        el.style.display = "block";
+                }
+            }});
+        $("#content").removeAttr('style').css("max-width","1000px");
+        });
+    </script>
+{% endblock %}

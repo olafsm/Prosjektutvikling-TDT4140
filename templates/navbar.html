@@ -1,0 +1,84 @@
+<nav class="navbar navbar-expand-sm navbar-dark fixed-top" style="background-color: #658361;">
+        <div class="container">
+        {% load static %}
+            <img src="{% static 'media/logo/logo.png' %}" height="30px">
+            <a class="navbar-brand pl-2" href="{% url 'index' %}">Matega</a>
+            <button class="navbar-toggler sidebar-toggle" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <button type="button" id="sidebarCollapse" class="btn">
+                <i class="fa fa-align-left fa-2x"></i>
+            </button>
+
+
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'index' %}"> Hjem <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'ingredient_search' %}"> Velg ingredienser <span class="sr-only">(current)</span></a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'my_recipes' user.id %}"> Lagrede oppskrifter <span class="sr-only">(current)</span></a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <!-- Kommentere ut søkefeltet i navbaren - kan bruke denne på brukerhistorie 15.
+                <form class="form-inline my-2 my-md-0">
+                    <input class="form-control" type="text" placeholder="Søk">
+                </form>
+                -->
+                <ul class="navbar-nav">
+                    <!--Hvis bruker er logget inn: vis navn og dropdownmeny for logout -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="fa fa-user"></span> {{ user.username }}
+                            </a>
+                            {{ user.name }}
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                {% if request.user.is_active and request.user.is_chef or request.user.is_superuser %}
+                                    {% if request.user.is_superuser %}
+                                         <a href="{% url 'admin:index' %}" class="dropdown-item">
+                                            <span class="fa fa-edit"></span>
+                                            Administrer side
+                                         </a>
+                                        <a href="{% url 'authorize_chef' %}" class="dropdown-item">
+                                            <span class="fa fa-check-square-o"></span>
+                                            Godkjenn forespørsler
+                                         </a>
+                                    {% endif %}
+                                    <a href="{% url 'add_recipe' %}" class="dropdown-item">
+                                        <span class="fa fa-plus"></span>
+                                        Legg til oppskrift
+                                    </a>
+                                    <a href="{% url 'chef_edit' %}" class="dropdown-item">
+                                        <span class="fa fa-user"></span>
+                                        Endre brukerinfo
+                                    </a>
+                                    <a href="{% url 'my_site' user.id %}" class="dropdown-item">
+                                        <span class="fa fa-user"></span>
+                                        Kokkeside
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'logout' %}" class="dropdown-item">
+                                    <span class="fa fa-sign-out"></span>
+                                    Logg ut
+                                </a>
+                            </div>
+                        </li>
+                    <!--Hvis ingen er logget inn: vis login og sign up knapper -->
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="{% url 'login' %}" class="nav-link"><span class="fa fa-sign-in"></span> Logg inn </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'signup' %}" class="nav-link"><span class="fa fa-user"></span> Registrer </a>
+                        </li>
+                    {% endif %}
+                </ul>
+          </div>
+        </div>
+    </nav>

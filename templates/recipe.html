@@ -1,0 +1,302 @@
+{% extends "base_template.html" %}
+{% load static %}
+{% block title %}
+    {{ recipe.name }}
+{% endblock %}
+
+{% block css %}
+    .rating-stars ul {
+        list-style-type:none;
+        -moz-user-select:none;
+        -webkit-user-select:none;
+    }
+    #star-popover:hover {
+        cursor: pointer;
+    }
+    .rating-stars-popover {
+        margin-left: -30px;
+    }
+    .rating-stars-display {
+        margin-left: -25px;
+    }
+    .popover-body {
+        padding: 0;
+        padding-top: 10px;
+        padding-right: 5px;
+    }
+    .rating-stars ul > li.star {
+      display:inline-block;
+
+    }
+
+    .rating-stars ul > li.star > i.fa {
+      font-size: 25px;
+      color:#ccc;
+    }
+
+    .rating-stars ul > li.star.hover > i.fa {
+      color:#FFCC36;
+    }
+
+    .rating-stars ul > li.star.selected > i.fa {
+      color:#FF912C;
+    }
+    #nam:hover {
+        cursor:pointer;
+    }
+{% endblock %}
+
+
+{% block content %}
+    <div id="message" >
+    </div>
+    <div class="container-fluid" style="padding-left: 10px">
+        <h1>
+            {{ recipe.name }}
+        </h1>
+        <div class="row">
+        <div class="col-sm-9 col-md-6 col-lg-8">
+            <div>
+                <img src="{{ recipe.image.url }}" class="img-fluid">
+            </div>
+
+            <div class="row">
+            <!--Average rating stjerner-->
+            <a data-placement="top" data-toggle="popover" data-container="body"
+               title="Vurder oppskriften <button type='button' id='close-popover' class='close'>&times;</button>" data-html="true"
+               id="star-popover" style="text-decoration: none;">
+                <div class='rating-stars mt-3 rating-stars-display' style="padding: 0;">
+                    <ul id='show-rating'>
+                      <li class='star' title='Poor' data-value='1'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Fair' data-value='2'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Good' data-value='3'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Excellent' data-value='4'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='WOW!!!' data-value='5'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                    </ul>
+              </div>
+            </a>
+            <!--Klikkbare stjerner for å rate en oppskrift-->
+            <div id="popover-content" class="d-none">
+               {% if user.is_authenticated %}
+                <div class='rating-stars rating-stars-popover'>
+                    <ul id='stars'>
+                      <li class='star' title='Poor' data-value='1'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Fair' data-value='2'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Good' data-value='3'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Excellent' data-value='4'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='WOW!!!' data-value='5'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                    </ul>
+                  </div>
+                {% else %}
+                <p style="padding-left: 5px;">Logg inn for å vurdere opskriften</p>
+                {% endif %}
+            </div>
+            {% if user.is_authenticated %}
+                <button id="nam" onclick="namClick()" title="Legg til oppskriften i Lagrede Oppskrifter"
+                        aria-label="Legg til oppskriften i Lagrede Oppskrifter"
+                        style="border-radius: 50%; background-color: ivory">
+                    <img src="{% static 'media/nam.png' %}" height="30px" width="30px">
+                </button>
+            {% endif %}
+            </div>
+             <div class="alert alert-success alert-dismissible fade show" style="display: none;" id="rating-suksess">
+                Takk for din vurdering av {{ recipe.name }}!
+                <button type="button" class="close"  aria-label="Close">
+                    <span aria-hidden="true" onclick="$('#rating-suksess').css('display', 'none')">&times;</span>
+                </button>
+            </div>
+            Ingredienser:
+            <br>
+            <div style="padding-left: 2%">
+                {% for ing in recipe.values.all %}
+                    <span id="{{ ing }}" style="color:red;" class="{{ ing }}">{{ ing }}</span>
+                    <br>
+                {% endfor %}
+            </div>
+            <br>
+            Fremgangsmåte:
+            <div style="padding-left: 2%; padding-bottom: 50px">
+                {{ recipe.recipe_text|linebreaksbr }}
+            </div>
+        </div>
+        <div class="col-sm-3 col-md-6 col-lg-4">
+            <img src="{{ recipe.chef.image.url }}" class="img-fluid">
+            <h6>{{ recipe.chef }}</h6>
+            <p>
+                <ul class="list-unstyled">
+                <li><u>Arbeidssted</u>: {{ recipe.chef.workplace }}</li>
+                <li><u>Utdanning</u>: {{ recipe.chef.education }}</li>
+                <li><u>Meritt</u>: {{ recipe.chef.merit }}</li>
+              </ul>
+                <a href="{% url 'chef_site' recipe.chef.id %}">
+                Gå til kokkens profil
+                </a>
+            </p>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        let arr = JSON.parse(localStorage.getItem('checked')) || [];
+        arr.forEach(function (i) {
+            $("."+i).css('color', 'green');
+        });
+
+    </script>
+    <script type="text/javascript">
+        //legger til og fjerner oppskrifter fra lagrede oppskrifter
+       function namClick() {
+            let color = document.getElementById("nam");
+            let backColor = color.style.backgroundColor;
+            let user_id = "{{ user.id }}";
+            let recipe_id = "{{ recipe.id }}";
+            if (backColor==="chartreuse") {
+                $.ajax({
+                    url: '/ajax/remove_recipe_from_user/',
+                    data: {
+                        'user_id': user_id,
+                        'recipe_id': recipe_id,
+                    },
+                    dataType: 'json',
+                });
+                color.style.backgroundColor = "ivory";
+                color.title = "Legg til oppskriften i Lagrede Oppskrifter";
+            }
+            else {
+                $.ajax({
+                    url: '/ajax/add_recipe_to_user/',
+                    data: {
+                        'user_id': user_id,
+                        'recipe_id': recipe_id,
+                    },
+                    dataType: 'json',
+                });
+                color.style.backgroundColor = "chartreuse";
+                color.title = "Fjern oppskriften fra Lagrede Oppskrifter"
+            }
+       }
+
+       $(document).ready(function(){
+           $("[data-toggle=popover]").popover({
+                html: true,
+                content: function() {
+                      return $('#popover-content').html();
+                    }
+           });
+           let average_rating = "{{ avg_rating }}";
+
+           let stars = $("#show-rating li.star");
+            for (let i = 0; i < stars.length; i++) {
+              $(stars[i]).removeClass('selected');
+            }
+
+            for (let i = 0; i < average_rating; i++) {
+              $(stars[i]).addClass('selected');
+            }
+
+
+
+           $("#star-popover").on('shown.bs.popover', function() {
+               $("#close-popover").on('click', function () {
+                   $("[data-toggle=popover]").popover('hide');
+               });
+
+               /* 1. Visualizing things on Hover - See next part for action on click */
+               $('#stars li').on('mouseover', function(){
+                let onStar = parseInt($(this).data('value'), 10); // The star currently mouse on
+
+                // Now highlight all the stars that's not after the current hovered star
+                $(this).parent().children('li.star').each(function(e){
+                  if (e < onStar) {
+                    $(this).addClass('hover');
+                  }
+                  else {
+                    $(this).removeClass('hover');
+                  }
+                });
+
+              }).on('mouseout', function(){
+                $(this).parent().children('li.star').each(function(e){
+                  $(this).removeClass('hover');
+                });
+              });
+
+              /* 2. Action to perform on click */
+              $('#stars li').on('click', function(){
+                let onStar = parseInt($(this).data('value'), 10); // The star currently selected
+                let stars = $(this).parent().children('li.star');
+                for (i = 0; i < stars.length; i++) {
+                  $(stars[i]).removeClass('selected');
+                }
+
+                for (i = 0; i < onStar; i++) {
+                  $(stars[i]).addClass('selected');
+                }
+
+                $.ajax({
+                url: '/ajax/add_rating/',
+                data: {
+                    'rating': onStar,
+                    'recipe': "{{ recipe.id }}"
+                },
+                dataType: 'json',
+                success: function (data) {
+                    $("#rating-suksess").css("display","block");
+                }
+                });
+              });
+        });
+
+          /* 3. Color "Nam"-button */
+            let button = document.getElementById("nam");
+            let user_id = "{{ user.id }}";
+            let recipe_id = "{{ recipe.id }}";
+            $.ajax({
+                url: '/ajax/is_fav_recipe/',
+                data: {
+                    'user_id': user_id,
+                    'recipe_id': recipe_id,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.is_fav) {
+                        button.style.backgroundColor = "chartreuse";
+                        button.title = "Fjern oppskriften fra Lagrede Oppskrifter";
+                    }
+                    else{
+                        button.style.backgroundColor = "ivory";
+                    }
+                }
+            });
+
+        });
+
+
+function responseMessage(msg) {
+  $('.success-box').fadeIn(200);
+  $('.success-box div.text-message').html("<span>" + msg + "</span>");
+}
+    </script>
+{% endblock %}
+

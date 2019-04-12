@@ -1,0 +1,25 @@
+{% extends "base_template.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+           Kokkeforespørsler
+{% endblock %}
+
+{% block content %}
+    {% if chefs %}
+        {% for chef in chefs %}
+                <!--Et form for hver kokk som venter på godkjenning-->
+                <form method="post">
+                {% csrf_token %}
+                        <div class="page-header">
+                        <h3>{{ chef }}, {{ chef.workplace }}</h3>
+                            <p>{{ chef.info }}</p>
+                        </div>
+                    <input type="hidden" name="chef.id" value="{{ chef.id }}">
+                <button type="submit" name="permission" class="btn btn-success">Godkjenn</button>
+                </form>
+        {% endfor %}
+    {% else %}
+        <p class="text-xl-center">Du har ingen kokker som venter på godkjenning</p>
+    {% endif %}
+{% endblock %}

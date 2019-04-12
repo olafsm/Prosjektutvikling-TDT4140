@@ -1,0 +1,81 @@
+{% extends "base_template.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Endre brukerinfo
+{% endblock %}
+
+{% block content %}
+     <div class="container">
+     <div class="page-header">
+          <h1 align="left"> Endre brukerinfo</h1>
+      </div>
+        <div class="row">
+            <!--Form for endring av kokkeinformasjon-->
+            <form method="post" enctype="multipart/form-data" class="col-lg-12">
+                {% csrf_token %}
+                {% with WIDGET_ERROR_CLASS="is-invalid" %}
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <!-- Workplace -->
+                                <div class="input-group mt-2 mb-3 w-50">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-briefcase fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.workplace class="form-control" placeholder='Arbeidssted'%}
+                                </div>
+                                <small class="text-danger">{{ chef_form.workplace.errors }}</small>
+
+                                <!-- Info -->
+                                <div class="input-group mt-2 mb-3 w-50">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-info-circle fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.info class="form-control" placeholder='Ytterligere informasjon'%}
+                                </div>
+                                <small class="text-danger">{{ chef_form.info.errors }}</small>
+
+                                <!-- Education -->
+                                <div class="input-group mt-2 mb-3 w-50">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-graduation-cap fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.education class="form-control" placeholder='Utdanning'%}
+                                </div>
+                                <small class="text-danger">{{ chef_form.education.errors }}</small>
+
+                                <!-- Merit -->
+                                <div class="input-group mt-2 mb-3 w-50">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><span class="fa fa-star fa-fw"></span> </div>
+                                </div>
+                                    {% render_field chef_form.merit class="form-control" placeholder='Merit'%}
+                                </div>
+                                <small class="text-danger">{{ chef_form.merit.errors }}</small>
+
+                                <!-- Image -->
+                                {% render_field chef_form.image %}
+                                 <small class="text-danger">{{ chef_form.image.errors }}</small>
+                                <br>
+
+                                <button type="submit" class="btn btn-success float-right" name="chef_form">Oppdater!</button>
+                                <style type="text/css">
+                                    .container.custom-container {
+                                    padding: 0 100px;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>
+                {% endwith %}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        $("#image-clear_id").css("display","none");
+        $("label[for='image-clear_id']").css("display","none");
+    </script>
+{% endblock %}

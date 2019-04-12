@@ -1,0 +1,79 @@
+{% extends "base_template.html" %}
+
+{% block title %}
+    {{ chef }}
+{% endblock %}
+
+{% block content %}
+<body>
+    <body>
+  <div class="container">
+        <!-- Overskirfte -->
+      <div class="page-header">
+          <h1 align="left"> {{ chef }}</h1>
+          </br>
+      </div>
+
+  <div class = row> <!-- En row rundt hele siden -->
+      <!-- Kolonnen til venstre -->
+      <div class="col-lg-5">
+          <div>
+            <img src="{{ chef.image.url }}" height="300px" width="300px" border="50">
+          </div>
+          <div>
+              <ul class="list-unstyled">
+                <li><u>Arbeidssted</u>: {{ chef.workplace }}</li>
+                <li><u>Utdanning</u>: {{ chef.education }}</li>
+                <li><u>Meritt</u>: {{ chef.merit }}</li>
+              </ul>
+              <div class="custom-container">{{ chef.info|linebreaksbr }}</div>
+          </div>
+      </div>
+
+      <!-- Kolonnen til høyre -->
+      <div class="col-lg-7">
+          <div class = "row">
+              <h3>{{ chef }} sine oppskrifter</h3>
+          </div>
+          <div class="row">
+            <ul class="list-group w-100">
+                {% for rec in recipes %}
+                    <a href="{% url 'recipe' rec.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="media">
+                            <img class="img-thumbnail" src="{{ rec.image.url }}" style="width: 100px; height: 100px">
+                            <div style="padding-left: 10px">
+                                <h5 class="mb-1" style="text-align: left">{{ rec.name }}</h5>
+                                <small> {{ rec.pub_date }} </small>
+                                <p class="mb-1">
+                                    <!-- Skriver ut hver ingrediens i oppskriften -->
+                                    {% for ing in rec.ingredients.all %}
+                                        <span id="{{ ing }}" style="color:red;" class="{{ ing }}">{{ ing }}</span>
+                                    {% endfor %}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </ul>
+          </div>
+      </div>
+    </div>
+
+
+  </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+       <script>
+        let arr = JSON.parse(localStorage.getItem('checked')) || [];
+        arr.forEach(function (i) {
+            $("[class='"+ i + "']").css('color', 'green');
+        });
+
+    </script>
+    </body>
+</body>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base_template.html" %}
+{% block title %}
+    Lagrede Oppskrifter
+{% endblock %}
+
+{% block content %}
+       {% if user.is_authenticated and user.id == user_id %}
+       <div class="row">
+           <!-- Lager en link til hver oppskrift som brukeren har lagret -->
+           <div class="list-group col-12" style="padding-right: 10px">
+           <h3>Lagrede Oppskrifter</h3>
+                {% if saved_recipes %}
+                    {%for recipe in saved_recipes %}
+                        <div id="item_{{ recipe.id }}" style="max-width: 600px;" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="row justify-content-between">
+                                <div class="col-sm-9 col-md-9 col-lg-10">
+                                    <a href="{% url 'recipe' recipe.id %}" class="list-group-item-action flex-column align-items-start">
+                                    <div class="media">
+                                        <img class="img-thumbnail" src="{{ recipe.image.url }}" style="width: 100px; height: 100px">
+                                        <div style="padding-left: 10px">
+                                            <h5 class="mb-1" style="text-align: left">{{ recipe.name }}</h5>
+                                            <small> {{ recipe.pub_date }} </small>
+                                            <p class="mb-1">
+                                                <!-- Skriver ut hver ingrediens i oppskriften -->
+                                                {% for ingredient in recipe.ingredients.all %}
+                                                    <span style="color:red" class="{{ ingredient.ingredient}}">{{ ingredient.ingredient }}{% include "comma.html" %}</span>
+                                                {% endfor %}
+                                            </p>
+                                            <small>Kokk: {{ recipe.chef }}</small>
+                                        </div>
+                                    </div>
+                                    </a>
+                                </div>
+                                <div>
+                                    <button onclick="removeRecipe({{ recipe.id }})" class="btn btn-light" title="Fjern oppskriften fra Lagrede Oppskrifter"><i class='fa fa-times'></i>Fjern</button>
+                                </div>
+                            </div>
+                        </div>
+                    {%endfor%}
+                {% else %}
+                    <p>Du har ikke noen lagrede oppskrifter.</p>
+                {% endif %}
+                </div>
+           </div>
+        {% else %}
+           <div>
+               <h6>Du har ikke tilgang til denne siden. Logg inn med rett bruker.</h6>
+           </div>
+        {% endif %}
+{% endblock %}
+{% block script %}
+    <script>
+        //Ajax request til serveren for å fjerne en oppskrift fra favoritter
+        function removeRecipe(id) {
+            let user_id = "{{ user.id }}";
+            var item = document.getElementById("item_"+id);
+            item.parentNode.removeChild(item);
+            $.ajax({
+                url: '/ajax/remove_recipe_from_user/',
+                data: {
+                    'user_id': user_id,
+                    'recipe_id': id,
+                },
+                dataType: 'json',
+            });
+        }
+    </script>
+{% endblock %}

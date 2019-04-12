@@ -1,0 +1,77 @@
+{% extends "../base_template.html" %}
+{% load widget_tweaks %}
+{% block title %}
+    Logg inn
+{% endblock %}
+
+{% block registration %}
+    <div style="width:400px;height: auto;margin:0 auto 0 auto">
+        <div class="card form-wrapper shadow-lg px-4 pb-4 pt-2 mt-5" style="width: 400px;">
+            <div class="card-body">
+                <h2>Logg inn</h2>
+                <form method="post" class="mb-5 mt-4">
+                    {% csrf_token %}
+
+                    <!-- Vis error meldinger i alert boks øverst-->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><span class="fa fa-user"></span> </div>
+                        </div>
+                            {% render_field form.username class="form-control" placeholder='Brukernavn'%}
+                    </div>
+                    <div class="input-group mt-2 mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><span class="fa fa-lock"></span> </div>
+                        </div>
+                            {% render_field form.password class="form-control" placeholder='Passord'%}
+                    </div>
+                    <button type="submit" class="btn btn-primary mr-0 float-right">Logg inn</button>
+                </form>
+            </div>
+            <div card-footer>
+                <hr>
+                <p class="text-center mt-0"> Ikke registrert ennå? <a href="{% url 'signup' %}"> Registrer deg  </a></p>
+                <p class="text-center mt-0"><a href="#">Glemt passord?</a></p>
+            </div>
+        </div>
+    </div>
+
+{% endblock registration %}
+{% block script %}
+    <!--
+        AJAX script for å validere username uten å refreshe siden.
+        legger til valid og invalid class til form field.
+        Dette kommer ikke til å brukes her - men kan flyttes til registrering når den siden er laget :D
+    -->
+    <script>
+        $("#id_username").change(function () {
+
+            let username =  $(this).val();
+
+            $.ajax({
+                url: '/ajax/validate_username/',
+                data: {
+                    'username': username
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if(!data.is_taken) {
+                        $("#id_username").removeClass("is-valid").addClass("is-invalid");
+                    }
+                    else {
+                        $("#id_username").removeClass("is-invalid").addClass("is-valid");
+                    }
+                }
+            });
+
+        });
+    </script>
+{% endblock script %}

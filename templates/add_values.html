@@ -1,0 +1,122 @@
+{% extends "base_template.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Add values
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+    .forms {
+        height: 600px;
+    }
+{% block content %}
+    <div class="container justify-content-center col-lg-8">
+        <div class="row">
+            <h4>Legg til mengde for hver ingrediens</h4>
+                 <table class="table table-bordered">
+                    <thead>
+                        <th>Mengde</th>
+                        <th>Ingrediens</th>
+                    </thead>
+                    <tbody>
+                        {% for form in forms %}
+                            <tr>
+                                <td>
+                                    <form id="form_{{ forloop.counter }}" name="form_{{ forloop.counter }}"
+                                          method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    {% with WIDGET_ERROR_CLASS="is-invalid" %}
+                                        <input type="text" name="recipe" style="display: none"
+                                               placeholder="Recipe" id="r_{{ forloop.counter }}" required="">
+                                        <input type="text" name="ingredient" style="display: none"
+                                               placeholder="Ingrediens" id="{{ forloop.counter }}" required="">
+                                        {% render_field form.value class="form-control mb-2"%}
+                                    {% endwith %}
+                                    </form>
+                                </td>
+                                <td id="td_{{ forloop.counter }}">
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <input type="button" value="Fullfør!" onclick="submitForms()" class="btn btn-success" />
+            </div>
+            <!-- Lager <td>-ene som legges til i tabellen over etter page-load -->
+            <div class="col-lg-4" style="display: none">
+                <table class="table table-border">
+                    <tbody>
+                        <th scope="col">Ingrediens</th>
+                        {% for ing in ingredients %}
+                            <tr id="tr_{{ forloop.counter }}">
+                                <td id="td2_{{ forloop.counter }}">
+                                    {{ ing.ingredient }}
+                                </td>
+                                <td id="ing_id_{{ forloop.counter }}">{{ ing.id }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+
+    //sjekker om ingrediensform er valid
+    function isValidForm()
+    {
+        var len = "{{ length }}";
+        console.log(len);
+        for (let i=1; i<=len; i++) {
+            var inp = document.forms["form_" + i]["value"].value;
+            if (inp == null || inp == "") {
+                alert("Vennligst fyll ut alle feltene");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //Sender inn alle valueingredient forms
+    function submitForms(){
+        if (isValidForm()) {
+            $('form').each(function () {
+                var that = $(this);
+                $.post(that.attr('action'), that.serialize());
+            });
+            var delayInMilliseconds = 500;
+
+            setTimeout(function() {
+                location.href = "recipe/{{ recipe.id }}";
+            }, delayInMilliseconds);
+        }
+    }
+    
+    $( document ).ready(function () {
+        // Legger til input-feltene i rett rad i tabellen på siden
+        var len = "{{ length }}";
+        console.log(len);
+        for (let i=1; i<=len; i++){
+            var td = document.getElementById("td_"+i);
+            var td2 = document.getElementById("td2_"+i);
+            var ing_id = document.getElementById("ing_id_"+i);
+            var ren = document.getElementById(i);
+            var rec = document.getElementById("r_"+i);
+            rec.value = {{ recipe.id }};
+            console.log(ing_id.innerText);
+            ren.value = ing_id.innerText;
+            console.log(ren);
+            // var valueForm = document.forms['form_'+i];
+            // valueForm.elements["ingredient"].value(td2.innerText);
+            console.log(td);
+            console.log(td2);
+            td.innerText = td2.innerText;
+        }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,21 @@
+# Valgmuligheter for ingredienskategorier
+ingredient_choices = (
+    ('Bakst', 'Bakst'),
+    ('Blodmat', 'Blodmat'),
+    ('Bær', 'Bær'),
+    ('Egg', 'Egg'),
+    ('Frukt', 'Frukt'),
+    ('Grønnsaker', 'Grønnsaker'),
+    ('Kjøtt', 'Kjøtt'),
+    ('Korn', 'Korn'),
+    ('Meieriprodukter', 'Meieriprodukter'),
+    ('Nøtter', 'Nøtter'),
+    ('Pålegg', 'Pålegg'),
+    ('Sjømat', 'Sjømat'),
+    ('Snacks', 'Snacks'),
+    ('Søtsaker', 'Søtsaker'),
+    ('Vegetabilske oljer', 'Vegetabilske oljer'),
+    ('Saus', 'Saus'),
+    ('Krydder', 'Krydder'),
+    ('Annet', 'Annet'),
+)
